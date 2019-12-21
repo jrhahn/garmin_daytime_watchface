@@ -1,0 +1,18 @@
+<properties>      
+    <property id="DST" type="boolean">true</property>
+    
+    <property id="HomeTimezoneOffset" type="number">3600</property>
+           
+    <property id="HourColor" type="number">0xFFFFFF</property>
+    <property id="MinuteColor" type="number">0xFFFFFF</property>
+    
+    <property id="UserLat" type="float">0.0</property>
+    
+    <property id="UserLng" type="float">0.0</property>
+        
+    <property id="CurrentTimezoneOffset" type="number">3600</property>
+    
+    <property id="CurrentDST" type="boolean">false</property>
+        
+    <property id="DarkSkyApiKey" type="string"></property>        
+</properties>
