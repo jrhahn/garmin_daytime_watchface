@@ -5,7 +5,7 @@ using Toybox.System;
 using Toybox.Time;
 using Toybox.Time.Gregorian;
 
-class daytimeWatchFaceApp extends Application.AppBase {
+class daytimeWatchFaceApp extends App.AppBase {
     hidden var view;
     hidden var sunRiseSet;
 
@@ -25,7 +25,7 @@ class daytimeWatchFaceApp extends Application.AppBase {
     // Return the initial view of your application here
     function getInitialView() {
 	
-		sunRiseSet = new SunRiseSunSet();
+		sunRiseSet = new SunriseSunsetCalculator();
     	
     	view = new daytimeWatchFaceView();
     	
