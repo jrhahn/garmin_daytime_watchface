@@ -16,5 +16,7 @@
 	
 	<property id="CurrentWeather" type="boolean">true</property>
         
-    <property id="DarkSkyApiKey" type="string"></property>        
+    <property id="DarkSkyApiKey" type="string"></property>    
+    
+    <property id="type_weather" type="number">8</property>    
 </properties>

@@ -48,7 +48,7 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     	5 => "thunderstorm", // thunderstorm
     	6 => "sleet", // sleet
     	7 => "snow",  // snow
-    	8 => "default" // default
+    	8 => "" // default
     };
 	
 	// Called every second
@@ -85,8 +85,8 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     	var hour = clockTime.hour;  	
     	var minute = clockTime.min;
     	
-    	var val = (hour*60 + minute) / 5;    	
-    	
+    	var val = (hour*60 + minute) / 5;    
+    	     
     	var imageLibrary = weatherMap[typeWeather];
        	                
     	if(isBefore(hour, minute, sunriseHH-1, sunriseMM)) {
