@@ -1,5 +1,5 @@
 <drawables>
-    <bitmap id="Sunrise" filename="_icon_sunrise_low.png" />
+    <bitmap id="Sunrise" filename="_icon_sunrise.png" />
     <bitmap id="Heart" filename="_icon_heart.png" />
     <bitmap id="Footprints" filename="_icon_footprints.png" />
         
