@@ -1,3 +1,129 @@
 <drawables>
+    <bitmap id="Sunrise" filename="_icon_sunrise_low.png" />
+    <bitmap id="Heart" filename="_icon_heart.png" />
+    <bitmap id="Footprints" filename="_icon_footprints.png" />
+        
     <bitmap id="LauncherIcon" filename="launcher_icon.png" />
+    
+    <bitmap id="clear_day_01" filename="bg_clear, day.jpg" />
+    <bitmap id="clear_day_02" filename="bg_clear, day-2.jpg" />
+    <bitmap id="clear_day_03" filename="bg_clear, day-3.jpg" />
+    <bitmap id="clear_day_04" filename="bg_clear, day-4.jpg" />
+    <bitmap id="clear_day_05" filename="bg_clear, day-5.jpg" />
+    <bitmap id="clear_day_06" filename="bg_clear, day-6.jpg" />
+    <bitmap id="clear_day_07" filename="bg_clear, day-7.jpg" />
+    <bitmap id="clear_day_08" filename="bg_clear, day-8.jpg" />
+    <bitmap id="clear_day_09" filename="bg_clear, day-9.jpg" />
+    <bitmap id="clear_day_10" filename="bg_clear, day-10.jpg" />
+    <bitmap id="clear_day_11" filename="bg_clear, day-11.jpg" />
+    <bitmap id="clear_day_12" filename="bg_clear, day-12.jpg" />
+    <bitmap id="clear_day_13" filename="bg_clear, day-13.jpg" />
+    <bitmap id="clear_day_14" filename="bg_clear, day-14.jpg" />
+    <bitmap id="clear_day_15" filename="bg_clear, day-15.jpg" />
+    <bitmap id="clear_day_16" filename="bg_clear, day-16.jpg" />
+    <bitmap id="clear_day_17" filename="bg_clear, day-17.jpg" />
+    <bitmap id="clear_day_18" filename="bg_clear, day-18.jpg" />
+    <bitmap id="clear_day_19" filename="bg_clear, day-19.jpg" />
+    <bitmap id="clear_day_20" filename="bg_clear, day-20.jpg" />
+    <bitmap id="clear_day_21" filename="bg_clear, day-21.jpg" />
+    <bitmap id="clear_day_22" filename="bg_clear, day-22.jpg" />
+    <bitmap id="clear_day_23" filename="bg_clear, day-23.jpg" />
+    <bitmap id="clear_day_24" filename="bg_clear, day-24.jpg" />
+    <bitmap id="clear_day_25" filename="bg_clear, day-25.jpg" />
+    <bitmap id="clear_day_26" filename="bg_clear, day-26.jpg" />
+    <bitmap id="clear_day_27" filename="bg_clear, day-27.jpg" />
+    <bitmap id="clear_day_28" filename="bg_clear, day-28.jpg" />
+    <bitmap id="clear_day_29" filename="bg_clear, day-29.jpg" />
+    <bitmap id="clear_day_30" filename="bg_clear, day-30.jpg" />
+    <bitmap id="clear_day_31" filename="bg_clear, day-31.jpg" />
+    <bitmap id="clear_day_32" filename="bg_clear, day-32.jpg" />
+    <bitmap id="clear_day_33" filename="bg_clear, day-33.jpg" />
+    <bitmap id="clear_day_34" filename="bg_clear, day-34.jpg" />
+    <bitmap id="clear_day_35" filename="bg_clear, day-35.jpg" />
+    <bitmap id="clear_day_36" filename="bg_clear, day-36.jpg" />
+    <bitmap id="clear_day_37" filename="bg_clear, day-37.jpg" />
+    <bitmap id="clear_day_38" filename="bg_clear, day-38.jpg" />
+    <bitmap id="clear_day_39" filename="bg_clear, day-39.jpg" />
+    <bitmap id="clear_day_40" filename="bg_clear, day-40.jpg" />
+
+    <bitmap id="clear_night_01" filename="bg_clear, night.jpg" />
+    <bitmap id="clear_night_02" filename="bg_clear, night-2.jpg" />
+    <bitmap id="clear_night_03" filename="bg_clear, night-3.jpg" />
+    <bitmap id="clear_night_04" filename="bg_clear, night-4.jpg" />
+    <bitmap id="clear_night_05" filename="bg_clear, night-5.jpg" />
+    <bitmap id="clear_night_06" filename="bg_clear, night-6.jpg" />
+    <bitmap id="clear_night_07" filename="bg_clear, night-7.jpg" />
+    <bitmap id="clear_night_08" filename="bg_clear, night-8.jpg" />
+    <bitmap id="clear_night_09" filename="bg_clear, night-9.jpg" />
+    <bitmap id="clear_night_10" filename="bg_clear, night-10.jpg" />
+    <bitmap id="clear_night_11" filename="bg_clear, night-11.jpg" />
+    <bitmap id="clear_night_12" filename="bg_clear, night-12.jpg" />
+    <bitmap id="clear_night_13" filename="bg_clear, night-13.jpg" />
+    <bitmap id="clear_night_14" filename="bg_clear, night-14.jpg" />
+    
+    <bitmap id="clear_sunrise_01" filename="bg_clear, sunrise.jpg" />
+    <bitmap id="clear_sunrise_02" filename="bg_clear, sunrise-2.jpg" />
+    <bitmap id="clear_sunrise_03" filename="bg_clear, sunrise-3.jpg" />
+    <bitmap id="clear_sunrise_04" filename="bg_clear, sunrise-4.jpg" />
+    <bitmap id="clear_sunrise_05" filename="bg_clear, sunrise-5.jpg" />
+    
+    <bitmap id="clear_sunset_01" filename="bg_clear, sunset.jpg" />
+    <bitmap id="clear_sunset_02" filename="bg_clear, sunset-2.jpg" />
+    <bitmap id="clear_sunset_03" filename="bg_clear, sunset-3.jpg" />
+    <bitmap id="clear_sunset_04" filename="bg_clear, sunset-4.jpg" />
+    <bitmap id="clear_sunset_05" filename="bg_clear, sunset-5.jpg" />
+    <bitmap id="clear_sunset_06" filename="bg_clear, sunset-6.jpg" />
+    <bitmap id="clear_sunset_07" filename="bg_clear, sunset-7.jpg" />
+    <bitmap id="clear_sunset_08" filename="bg_clear, sunset-8.jpg" />
+    <bitmap id="clear_sunset_09" filename="bg_clear, sunset-9.jpg" />
+    <bitmap id="clear_sunset_10" filename="bg_clear, sunset-10.jpg" />
+    <bitmap id="clear_sunset_11" filename="bg_clear, sunset-11.jpg" />
+    <bitmap id="clear_sunset_12" filename="bg_clear, sunset-12.jpg" />
+    <bitmap id="clear_sunset_13" filename="bg_clear, sunset-13.jpg" />
+    <bitmap id="clear_sunset_14" filename="bg_clear, sunset-14.jpg" />
+    <bitmap id="clear_sunset_15" filename="bg_clear, sunset-15.jpg" />
+    <bitmap id="clear_sunset_16" filename="bg_clear, sunset-16.jpg" />
+    
+    
+    <bitmap id="cloudy_day_01" filename="bg_cloudy, day.jpg" />
+    <bitmap id="cloudy_day_02" filename="bg_cloudy, day-2.jpg" />
+    <bitmap id="cloudy_day_03" filename="bg_cloudy, day-3.jpg" />
+    <bitmap id="cloudy_day_04" filename="bg_cloudy, day-4.jpg" />
+    <bitmap id="cloudy_day_05" filename="bg_cloudy, day-5.jpg" />
+    <bitmap id="cloudy_day_06" filename="bg_cloudy, day-6.jpg" />
+    <bitmap id="cloudy_day_07" filename="bg_cloudy, day-7.jpg" />
+    <bitmap id="cloudy_day_08" filename="bg_cloudy, day-8.jpg" />
+    <bitmap id="cloudy_day_09" filename="bg_cloudy, day-9.jpg" />
+    <bitmap id="cloudy_day_10" filename="bg_cloudy, day-10.jpg" />
+    <bitmap id="cloudy_day_11" filename="bg_cloudy, day-11.jpg" />
+    <bitmap id="cloudy_day_12" filename="bg_cloudy, day-12.jpg" />
+    <bitmap id="cloudy_day_13" filename="bg_cloudy, day-13.jpg" />
+    <bitmap id="cloudy_day_14" filename="bg_cloudy, day-14.jpg" />
+    <bitmap id="cloudy_day_15" filename="bg_cloudy, day-15.jpg" />
+    <bitmap id="cloudy_day_16" filename="bg_cloudy, day-16.jpg" />
+    <bitmap id="cloudy_day_17" filename="bg_cloudy, day-17.jpg" />
+    <bitmap id="cloudy_day_18" filename="bg_cloudy, day-18.jpg" />
+    <bitmap id="cloudy_day_19" filename="bg_cloudy, day-19.jpg" />
+    <bitmap id="cloudy_day_20" filename="bg_cloudy, day-20.jpg" />
+    
+    <bitmap id="cloudy_night_01" filename="bg_cloudy, night.jpg" />
+    
+    <bitmap id="cloudy_sunrise_01" filename="bg_partly-cloudy, sunrise.jpg" />
+    
+    <bitmap id="cloudy_sunset_01" filename="bg_cloudy, sunset.jpg" />
+    <bitmap id="cloudy_sunset_02" filename="bg_cloudy, sunset-2.jpg" />        
+    
+    <bitmap id="rainy_day_01" filename="bg_day, rainy.jpg" />
+    <bitmap id="rainy_day_02" filename="bg_day, rainy-2.jpg" />
+    <bitmap id="rainy_day_03" filename="bg_day, rainy-3.jpg" />
+    <bitmap id="rainy_day_04" filename="bg_day, rainy-4.jpg" />
+    <bitmap id="rainy_day_05" filename="bg_day, rainy-5.jpg" />
+    <bitmap id="rainy_day_06" filename="bg_day, rainy-6.jpg" />
+    <bitmap id="rainy_day_06" filename="bg_day, rainy-7.jpg" />
+    
+    <bitmap id="rainy_night_01" filename="bg_night, partly-cloudy.jpg" />
+    
+    <bitmap id="rainy_sunrise_01" filename="bg_night, partly-cloudy.jpg" />
+    
+    <bitmap id="rainy_sunset_01" filename="bg_partly-cloudy, sunset-8.jpg" />        
 </drawables>
