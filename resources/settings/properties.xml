@@ -18,5 +18,7 @@
         
     <property id="DarkSkyApiKey" type="string"></property>    
     
-    <property id="type_weather" type="number">8</property>    
+    <property id="type_weather" type="string">8</property>   
+    
+    <property id="weather_temp" type="number">21</property>     
 </properties>

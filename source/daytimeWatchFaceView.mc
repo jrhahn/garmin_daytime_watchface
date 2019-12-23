@@ -147,6 +147,7 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
 
     // Update the view
     function onUpdate(dc) {
+        var temperature = App.getApp().getProperty("weather_temp");
         showLeadingZero = App.getApp().getProperty("ShowLeadingZero");
         sunRiseSet = new SunriseSunsetCalculator();
         
@@ -180,7 +181,7 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
            sunText = sunsetText;
         }
         dc.drawText(125, 200, Gfx.FONT_SYSTEM_XTINY, sunText, Gfx.TEXT_JUSTIFY_CENTER);                
-        dc.drawText(120, 170, Gfx.FONT_SYSTEM_XTINY, typeWeather, Gfx.TEXT_JUSTIFY_CENTER);        
+        dc.drawText(120, 170, Gfx.FONT_SYSTEM_XTINY, Lang.format("$1$°C", [temperature]), Gfx.TEXT_JUSTIFY_CENTER);        
         dc.drawText(120, 185, Gfx.FONT_SYSTEM_XTINY, weatherMapToText[typeWeather], Gfx.TEXT_JUSTIFY_CENTER);
     }
 	
