@@ -27,16 +27,21 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     var sunsetText = "";  
     var sunriseIsInit = false;  
 	
-	var weatherMap = {
-    	0 => new ImageLibraryWeatherClear(), // clear
-    	1 => new ImageLibraryWeatherRainy(), // rain
-    	2 => new ImageLibraryWeatherRainy(), // hail
-    	3 => new ImageLibraryWeatherCloudy(), // cloudy
-    	4 => new ImageLibraryWeatherCloudy(), // partly-cloudy
-    	5 => new ImageLibraryWeatherRainy(), // thunderstorm
-    	6 => new ImageLibraryWeatherRainy(), // sleet
-    	7 => new ImageLibraryWeatherRainy(), // snow
-    	8 => new ImageLibraryWeatherClear() // default
+    var imageLibClear = new ImageLibraryWeatherClear();
+    var imageLibRainy = new ImageLibraryWeatherRainy();
+    var imageLibCloudy = new ImageLibraryWeatherCloudy();
+    
+    var weatherMap = {
+    	0 => imageLibClear,  // clear
+    	1 => imageLibRainy, // rain
+    	2 => imageLibRainy, // hail
+    	3 => imageLibCloudy, // cloudy
+    	4 => imageLibCloudy, // partly-cloudy
+    	5 => imageLibRainy, // thunderstorm
+    	6 => imageLibRainy, // sleet
+    	7 => imageLibRainy,  // snow
+    	8 => imageLibClear, // default
+    	null => imageLibClear
     };
     
     var weatherMapToText = {
@@ -156,7 +161,7 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
         
         updateHeartrateText();           	
         	
-        var typeWeather = App.getApp().getProperty("type_weather");
+        var typeWeather = App.getApp().getProperty("type_weather").toNumber();
         var clockTime = System.getClockTime();
   
         dc.drawBitmap(0, 0, loadImage(clockTime, typeWeather));
@@ -181,7 +186,7 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
            sunText = sunsetText;
         }
         dc.drawText(125, 200, Gfx.FONT_SYSTEM_XTINY, sunText, Gfx.TEXT_JUSTIFY_CENTER);                
-        dc.drawText(120, 170, Gfx.FONT_SYSTEM_XTINY, Lang.format("$1$°C", [temperature]), Gfx.TEXT_JUSTIFY_CENTER);        
+        dc.drawText(120, 170, Gfx.FONT_SYSTEM_XTINY, Lang.format("$1$°C", [temperature.format("%0.1f")]), Gfx.TEXT_JUSTIFY_CENTER); 
         dc.drawText(120, 185, Gfx.FONT_SYSTEM_XTINY, weatherMapToText[typeWeather], Gfx.TEXT_JUSTIFY_CENTER);
     }
 	

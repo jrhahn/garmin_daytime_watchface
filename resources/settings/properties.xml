@@ -20,5 +20,5 @@
     
     <property id="type_weather" type="string">8</property>   
     
-    <property id="weather_temp" type="number">21</property>     
+    <property id="weather_temp" type="float">21.0</property>     
 </properties>
