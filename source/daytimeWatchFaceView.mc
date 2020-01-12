@@ -83,7 +83,7 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
         
     	for(var i=0; i < numHeartRateMeasurements; i++) {
     		heartRateMeasurementsValues[i] = minHeartRate + i;
-    	}
+    	}    	
     }
 
     // Load your resources here
@@ -168,27 +168,25 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
 	    heartRateMeasurementsValues[numHeartRateMeasurements-1] = currentHeartrate;
     } 
     
-    private function plotHeartrateGraph(dc, originX, originY, sizeX, sizeY) {
-    
+    private function plotHeartrateGraph(dc, originX, originY, sizeX, sizeY) {    
     	dc.setColor(0xFFFFFF, Gfx.COLOR_TRANSPARENT);
     	dc.drawLine(originX-1, originY, originX-1, originY-sizeY);
     	dc.drawLine(originX-1, originY, originX+sizeX+1, originY);
     	    	
 //    	y = mx + n//    	
-//    	sizeY = m 185 + n
-//    	0     = m 40 + n
-//    	n = -m40
-//    	sizeY = m185 - 40m
-//    	sizeY = m (max - min);
+//    	originY-sizeY = m * maxHeartRate + n
+//    	originY = m * minHeartRate + n
+//    	sizeY = m * (minHeartRate-maxHeartRate)
+//      n = originY - m * minHeartRate 
 
-    	var m = sizeY / (maxHeartRate - minHeartRate);
-    	var n = -m * minHeartRate;
-    	
+    	var m = sizeY / (minHeartRate - maxHeartRate * 1.0);
+    	var n = originY - m * minHeartRate;
+    	    	    	
+    	//    		dc.setColor(0x3F888F, Gfx.COLOR_TRANSPARENT);
     	for(var i=0; i < numHeartRateMeasurements; i++) {
     		var posY = m * heartRateMeasurementsValues[i] + n;
-//    		dc.setColor(0x3F888F, Gfx.COLOR_TRANSPARENT);
-            dc.setColor(0x3F888F-numHeartRateMeasurements+i, Gfx.COLOR_TRANSPARENT);
-    		dc.drawCircle(i+originX, originY-posY, 1);
+//            dc.setColor(0x3F888F-numHeartRateMeasurements+i, Gfx.COLOR_TRANSPARENT);
+    		dc.drawCircle(i+originX, posY, 1);
     	}
     }
 
