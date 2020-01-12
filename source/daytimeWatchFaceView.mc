@@ -31,6 +31,14 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     var imageLibRainy = new ImageLibraryWeatherRainy();
     var imageLibCloudy = new ImageLibraryWeatherCloudy();
     
+    const numHeartRateMeasurements = 60;
+    const maxHeartRate = 185;
+	const minHeartRate = 40;
+    
+    var heartRateMeasurementsValues = new [numHeartRateMeasurements];
+    var heartRateMeasurementsTimestamps = new [numHeartRateMeasurements];
+    var heartRateMeasurementsIndex = 0;
+    
     var weatherMap = {
     	0 => imageLibClear,  // clear
     	1 => imageLibRainy, // rain
@@ -40,8 +48,7 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     	5 => imageLibRainy, // thunderstorm
     	6 => imageLibRainy, // sleet
     	7 => imageLibRainy,  // snow
-    	8 => imageLibClear, // default
-    	null => imageLibClear
+    	8 => imageLibClear // default
     };
     
     var weatherMapToText = {
@@ -73,6 +80,10 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
 
     function initialize() {
         WatchFace.initialize();
+        
+    	for(var i=0; i < numHeartRateMeasurements; i++) {
+    		heartRateMeasurementsValues[i] = minHeartRate + i;
+    	}
     }
 
     // Load your resources here
@@ -147,8 +158,39 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
 	
 		if(currentHeartrate != Mon.INVALID_HR_SAMPLE) {
 			heartrateText =  currentHeartrate.format("%d");
-		}		
+		}	
+		
+		// shift
+		for(var i = 0; i < numHeartRateMeasurements-1; i++) {
+			heartRateMeasurementsValues[i] = heartRateMeasurementsValues[i+1];
+		}			
+						
+	    heartRateMeasurementsValues[numHeartRateMeasurements-1] = currentHeartrate;
     } 
+    
+    private function plotHeartrateGraph(dc, originX, originY, sizeX, sizeY) {
+    
+    	dc.setColor(0xFFFFFF, Gfx.COLOR_TRANSPARENT);
+    	dc.drawLine(originX-1, originY, originX-1, originY-sizeY);
+    	dc.drawLine(originX-1, originY, originX+sizeX+1, originY);
+    	    	
+//    	y = mx + n//    	
+//    	sizeY = m 185 + n
+//    	0     = m 40 + n
+//    	n = -m40
+//    	sizeY = m185 - 40m
+//    	sizeY = m (max - min);
+
+    	var m = sizeY / (maxHeartRate - minHeartRate);
+    	var n = -m * minHeartRate;
+    	
+    	for(var i=0; i < numHeartRateMeasurements; i++) {
+    		var posY = m * heartRateMeasurementsValues[i] + n;
+//    		dc.setColor(0x3F888F, Gfx.COLOR_TRANSPARENT);
+            dc.setColor(0x3F888F-numHeartRateMeasurements+i, Gfx.COLOR_TRANSPARENT);
+    		dc.drawCircle(i+originX, originY-posY, 1);
+    	}
+    }
 
     // Update the view
     function onUpdate(dc) {
@@ -188,6 +230,8 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
         dc.drawText(125, 200, Gfx.FONT_SYSTEM_XTINY, sunText, Gfx.TEXT_JUSTIFY_CENTER);                
         dc.drawText(120, 170, Gfx.FONT_SYSTEM_XTINY, Lang.format("$1$°C", [temperature.format("%0.1f")]), Gfx.TEXT_JUSTIFY_CENTER); 
         dc.drawText(120, 185, Gfx.FONT_SYSTEM_XTINY, weatherMapToText[typeWeather], Gfx.TEXT_JUSTIFY_CENTER);
+        
+        plotHeartrateGraph(dc, 150, 100, numHeartRateMeasurements, 50);
     }
 	
 	function isBefore(timeAHH, timeAMM, timeBHH, timeBMM) {
