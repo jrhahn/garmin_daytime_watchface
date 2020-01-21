@@ -5,6 +5,7 @@ using Toybox.WatchUi;
 using Toybox.ActivityMonitor as Mon;
 using Toybox.Application as App;
 using Toybox.Math as Math;
+using Toybox.Time;
 
 
 class daytimeWatchFaceView extends WatchUi.WatchFace {
@@ -181,6 +182,7 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     	
     	
 		var timeHorizon = new Time.Duration(4*3600); // last 4 hours
+		var heartrateIterator = ActivityMonitor.getHeartRateHistory(timeHorizon, false);	
     	
     	if(isDayTime) {
     		dc.setColor(0x112277, Gfx.COLOR_TRANSPARENT);
@@ -209,9 +211,10 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     	// --> n = originX+numHeartRateMeasurements
     	// m = (originX - n) / timeHorizon
     	var n_x = originX + numHeartRateMeasurements;
-    	var m_x = (originX - n_x) / timeHorizon;
+    	var diff = (originX - n_x) ;
+    	var m_x = diff / timeHorizon.value();
     		
-		var heartrateIterator = ActivityMonitor.getHeartRateHistory(timeHorizon, false);	
+		
 
 //		for(var i = 0; i < numHeartRateMeasurements; i++) {
 //			heartRateMeasurementsValues[i] = heartrateIterator.next().heartRate;
@@ -222,7 +225,7 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     		var hr_ = heartrateIterator.next().heartRate;
     		var time_ = heartrateIterator.next().when;
     		
-    		var posX_ = m_x * time_ + n_x;
+    		var posX_ = m_x * time_.value() + n_x;
     		
     		if(hr_ == Mon.INVALID_HR_SAMPLE) {
     			continue;
