@@ -98,8 +98,9 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     function onShow() {
     }
 	
-	function loadImage(clockTime, typeWeather) {    	
-    	var hour = clockTime.hour;  	
+	function loadImage(typeWeather) { 
+        var clockTime = Sys.getClockTime();   	
+    	var hour = clockTime.hour;	
     	var minute = clockTime.min;
     	
     	var val = (hour*60 + minute) / 5;    
@@ -182,7 +183,10 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     	
     	
 		var timeHorizon = new Time.Duration(4*3600); // last 4 hours
-		var heartrateIterator = ActivityMonitor.getHeartRateHistory(timeHorizon, false);	
+		var heartrateIterator = ActivityMonitor.getHeartRateHistory(null, true);
+		var lastHRSample = heartrateIterator.next();
+		
+		heartrateIterator = ActivityMonitor.getHeartRateHistory(timeHorizon, false);	
     	
     	if(isDayTime) {
     		dc.setColor(0x112277, Gfx.COLOR_TRANSPARENT);
@@ -206,28 +210,27 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     	
     	// x-axis
     	// y = mx+n
-    	// I. originX = timeHorizon*m + n
-    	// II originX+numHeartRateMeasurements = 0*m + n
-    	// --> n = originX+numHeartRateMeasurements
-    	// m = (originX - n) / timeHorizon
-    	var n_x = originX + numHeartRateMeasurements;
-    	var diff = (originX - n_x) ;
-    	var m_x = diff / timeHorizon.value();
+    	// I. originX = (last-timeHorizon)*m + n
+    	// II originX+numHeartRateMeasurements = last*m + n
+    	// --> -numHeartRateMeasurements = -timeHorizon * m
+    	// --> m = numHeartRateMeasurements / timeHorizon
+    	// --> n = originX - (last-timeHorizon)*m 
+    	var m_x = numHeartRateMeasurements / timeHorizon.value();    	
+    	var n_x = originX- (lastHRSample.when.value()-timeHorizon.value())*m_x;
+    	    	
+    	for(var i=0; i < numHeartRateMeasurements; i++) {  
+    		var sample_ = heartrateIterator.next();
     		
-		
-
-//		for(var i = 0; i < numHeartRateMeasurements; i++) {
-//			heartRateMeasurementsValues[i] = heartrateIterator.next().heartRate;
-//		}
-    	    	    	
-    	//    		dc.setColor(0x3F888F, Gfx.COLOR_TRANSPARENT);
-    	for(var i=0; i < numHeartRateMeasurements; i++) {    	
-    		var hr_ = heartrateIterator.next().heartRate;
-    		var time_ = heartrateIterator.next().when;
+    		if(null == sample_) {
+    			continue;
+    		}
     		
-    		var posX_ = m_x * time_.value() + n_x;
+    		var hr_ = sample_.heartRate;
+    		var time_ = sample_.when.value();
     		
-    		if(hr_ == Mon.INVALID_HR_SAMPLE) {
+    		var posX_ = m_x * time_ + n_x;
+    		
+    		if(Mon.INVALID_HR_SAMPLE == hr_) {
     			continue;
     		}
     		
@@ -251,7 +254,7 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
         var typeWeather = App.getApp().getProperty("type_weather").toNumber();
         var clockTime = System.getClockTime();
   
-        dc.drawBitmap(0, 0, loadImage(clockTime, typeWeather));
+        dc.drawBitmap(0, 0, loadImage(typeWeather));
         
         dc.setColor(0x3F888F, Gfx.COLOR_TRANSPARENT);
         dc.drawText(45, 20, Gfx.FONT_NUMBER_HOT, clockTime.hour.format("%02d"), Gfx.TEXT_JUSTIFY_LEFT); 
