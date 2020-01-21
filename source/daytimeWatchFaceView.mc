@@ -208,7 +208,7 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     	// II originX+numHeartRateMeasurements = 0*m + n
     	// --> n = originX+numHeartRateMeasurements
     	// m = (originX - n) / timeHorizon
-    	var n_x = originX + numHeartRateMeasuremen;
+    	var n_x = originX + numHeartRateMeasurements;
     	var m_x = (originX - n_x) / timeHorizon;
     		
 		var heartrateIterator = ActivityMonitor.getHeartRateHistory(timeHorizon, false);	
