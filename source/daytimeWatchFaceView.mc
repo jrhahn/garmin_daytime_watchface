@@ -35,9 +35,9 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     const maxHeartRate = 185;
 	const minHeartRate = 40;
     
-    var heartRateMeasurementsValues = new [numHeartRateMeasurements];
-    var heartRateMeasurementsTimestamps = new [numHeartRateMeasurements];
-    var heartRateMeasurementsIndex = 0;
+//    var heartRateMeasurementsValues = new [numHeartRateMeasurements];
+//    var heartRateMeasurementsTimestamps = new [numHeartRateMeasurements];
+//    var heartRateMeasurementsIndex = 0;
     
     var weatherMap = {
     	0 => imageLibClear,  // clear
@@ -81,9 +81,9 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     function initialize() {
         WatchFace.initialize();
         
-    	for(var i=0; i < numHeartRateMeasurements; i++) {
-    		heartRateMeasurementsValues[i] = minHeartRate + i;
-    	}    	
+//    	for(var i=0; i < numHeartRateMeasurements; i++) {
+//    		heartRateMeasurementsValues[i] = minHeartRate + i;
+//    	}    	
     }
 
     // Load your resources here
@@ -158,35 +158,79 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
 	
 		if(currentHeartrate != Mon.INVALID_HR_SAMPLE) {
 			heartrateText =  currentHeartrate.format("%d");
-		}	
+		}
 		
-		// shift
-		for(var i = 0; i < numHeartRateMeasurements-1; i++) {
-			heartRateMeasurementsValues[i] = heartRateMeasurementsValues[i+1];
-		}			
-						
-	    heartRateMeasurementsValues[numHeartRateMeasurements-1] = currentHeartrate;
+//		heartrateIterator = ActivityMonitor.getHeartRateHistory(numHeartRateMeasurements, false);	
+//
+//		for(var i = 0; i < numHeartRateMeasurements; i++) {
+//			heartRateMeasurementsValues[i] = heartrateIterator.next().heartRate;
+//		}			
+//						
+//	    heartRateMeasurementsValues[numHeartRateMeasurements-1] = currentHeartrate;	
+		
+//		// shift
+//		for(var i = 0; i < numHeartRateMeasurements-1; i++) {
+//			heartRateMeasurementsValues[i] = heartRateMeasurementsValues[i+1];
+//		}			
+//						
+//	    heartRateMeasurementsValues[numHeartRateMeasurements-1] = currentHeartrate;
     } 
     
-    private function plotHeartrateGraph(dc, originX, originY, sizeX, sizeY) {    
-    	dc.setColor(0xFFFFFF, Gfx.COLOR_TRANSPARENT);
+    private function plotHeartrateGraph(dc, originX, originY, sizeX, sizeY, isDayTime) { 
+    	// todo make color time dependent   
+    	
+    	
+		var timeHorizon = new Time.Duration(4*3600); // last 4 hours
+    	
+    	if(isDayTime) {
+    		dc.setColor(0x112277, Gfx.COLOR_TRANSPARENT);
+		}
+		else {
+			dc.setColor(0xFFFFFF, Gfx.COLOR_TRANSPARENT);
+		}
+			
     	dc.drawLine(originX-1, originY, originX-1, originY-sizeY);
     	dc.drawLine(originX-1, originY, originX+sizeX+1, originY);
     	    	
+//		y-axis
 //    	y = mx + n//    	
 //    	originY-sizeY = m * maxHeartRate + n
 //    	originY = m * minHeartRate + n
 //    	sizeY = m * (minHeartRate-maxHeartRate)
 //      n = originY - m * minHeartRate 
 
-    	var m = sizeY / (minHeartRate - maxHeartRate * 1.0);
-    	var n = originY - m * minHeartRate;
+    	var m_y = sizeY / (minHeartRate - maxHeartRate * 1.0);
+    	var n_y = originY - m_y * minHeartRate;
+    	
+    	// x-axis
+    	// y = mx+n
+    	// I. originX = timeHorizon*m + n
+    	// II originX+numHeartRateMeasurements = 0*m + n
+    	// --> n = originX+numHeartRateMeasurements
+    	// m = (originX - n) / timeHorizon
+    	var n_x = originX + numHeartRateMeasuremen;
+    	var m_x = (originX - n_x) / timeHorizon;
+    		
+		var heartrateIterator = ActivityMonitor.getHeartRateHistory(timeHorizon, false);	
+
+//		for(var i = 0; i < numHeartRateMeasurements; i++) {
+//			heartRateMeasurementsValues[i] = heartrateIterator.next().heartRate;
+//		}
     	    	    	
     	//    		dc.setColor(0x3F888F, Gfx.COLOR_TRANSPARENT);
-    	for(var i=0; i < numHeartRateMeasurements; i++) {
-    		var posY = m * heartRateMeasurementsValues[i] + n;
+    	for(var i=0; i < numHeartRateMeasurements; i++) {    	
+    		var hr_ = heartrateIterator.next().heartRate;
+    		var time_ = heartrateIterator.next().when;
+    		
+    		var posX_ = m_x * time_ + n_x;
+    		
+    		if(hr_ == Mon.INVALID_HR_SAMPLE) {
+    			continue;
+    		}
+    		
+    		var posY_ = m_y * hr_ + n_y;
 //            dc.setColor(0x3F888F-numHeartRateMeasurements+i, Gfx.COLOR_TRANSPARENT);
-    		dc.drawCircle(i+originX, posY, 1);
+    		dc.drawCircle(posX_, posY_, 1);
     	}
     }
 
@@ -220,16 +264,18 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
                 
         dc.drawBitmap(88, 204,  WatchUi.loadResource(Rez.Drawables.Sunrise)); 
          
+        var isDayTime = false;
         var sunText = sunriseText;      
         if(isBefore(clockTime.hour, clockTime.min, sunsetHH, sunsetMM) &&
            isBefore(sunriseHH, sunriseMM, clockTime.hour, clockTime.min)) {
            sunText = sunsetText;
+           isDayTime = true;
         }
         dc.drawText(125, 200, Gfx.FONT_SYSTEM_XTINY, sunText, Gfx.TEXT_JUSTIFY_CENTER);                
         dc.drawText(120, 170, Gfx.FONT_SYSTEM_XTINY, Lang.format("$1$°C", [temperature.format("%0.1f")]), Gfx.TEXT_JUSTIFY_CENTER); 
         dc.drawText(120, 185, Gfx.FONT_SYSTEM_XTINY, weatherMapToText[typeWeather], Gfx.TEXT_JUSTIFY_CENTER);
         
-        plotHeartrateGraph(dc, 150, 100, numHeartRateMeasurements, 50);
+        plotHeartrateGraph(dc, 150, 100, numHeartRateMeasurements, 50, isDayTime);
     }
 	
 	function isBefore(timeAHH, timeAMM, timeBHH, timeBMM) {
