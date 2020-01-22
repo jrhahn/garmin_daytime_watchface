@@ -182,10 +182,11 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     	// todo make color time dependent   
     	
     	
-		var timeHorizon = new Time.Duration(4*3600); // last 4 hours
+		
 		var heartrateIterator = ActivityMonitor.getHeartRateHistory(null, true);
 		var lastHRSample = heartrateIterator.next();
 		
+		var timeHorizon = new Time.Duration(4*3600); // last 4 hours
 		heartrateIterator = ActivityMonitor.getHeartRateHistory(timeHorizon, false);	
     	
     	if(isDayTime) {
@@ -216,7 +217,7 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     	// --> m = numHeartRateMeasurements / timeHorizon
     	// --> n = originX - (last-timeHorizon)*m 
     	var m_x = numHeartRateMeasurements / timeHorizon.value();    	
-    	var n_x = originX- (lastHRSample.when.value()-timeHorizon.value())*m_x;
+    	var n_x = originX - (lastHRSample.when.value()-timeHorizon.value()) * m_x;
     	    	
     	for(var i=0; i < numHeartRateMeasurements; i++) {  
     		var sample_ = heartrateIterator.next();
@@ -228,7 +229,7 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     		var hr_ = sample_.heartRate;
     		var time_ = sample_.when.value();
     		
-    		var posX_ = m_x * time_ + n_x;
+    		var posX_ = originX + i; // m_x * time_ + n_x;
     		
     		if(Mon.INVALID_HR_SAMPLE == hr_) {
     			continue;
@@ -285,11 +286,11 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     }
 	
 	function isBefore(timeAHH, timeAMM, timeBHH, timeBMM) {
-    	if(timeAHH < timeBHH) {
+    	if(timeAHH.value() < timeBHH.value()) {
     		return true;
     	}
     	
-    	if((timeAHH == timeBHH) && (timeAMM < timeBMM)) {
+    	if((timeAHH.value() == timeBHH.value()) && (timeAMM.value() < timeBMM.value())) {
     		return true;
     	}
     	
