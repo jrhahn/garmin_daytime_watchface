@@ -211,7 +211,7 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     	// --> n = originX + sizeXAxis - last * sizeXAxis / timeHorizon
     	// --> n = originX + sizeXAxis - first * sizeXAxis / timeHorizon
     	// --> n = originX + sizeXAxis - (last-timeHz) * sizeXAxis / timeHorizon
-    	var m_x = sizeX / timeHorizon.value().toFloat();    	
+    	var m_x = 4.0 * sizeX / timeHorizon.value().toFloat();    	
     	var n_x = originX - (lastHRSample.when.value()-timeHorizon.value()) * m_x;
     	//var n_x = originX + sizeX *( 1 - lastHRSample.when.value() / timeHorizon.value().toFloat());
 //    	var n_x = originX + sizeX - (lastHRSample.when.value();
@@ -228,12 +228,14 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     		
     		var posX_ = m_x * time_ + n_x;
     		
+    		System.println("ii: " + i);
     		System.println("n_x: " + n_x);
     		System.println("time_: " + time_);
     		System.println("m_x: " + m_x);
     		System.println("pos_x: " + posX_);
     		System.println("time horizon: " + timeHorizon.value());
 			System.println("last: " + lastHRSample.when.value());
+			
     		
     		if(Mon.INVALID_HR_SAMPLE == hr_) {
     			continue;
@@ -277,8 +279,8 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
          
         var isDayTime = false;
         var sunText = sunriseText;      
-        if(isBefore(clockTime.hour, clockTime.min, sunsetHH, sunsetMM) &&
-           isBefore(sunriseHH, sunriseMM, clockTime.hour, clockTime.min)) {
+        if(isBefore(clockTime.hour, clockTime.min, sunsetHH.toNumber(), sunsetMM.toNumber()) &&
+           isBefore(sunriseHH.toNumber(), sunriseMM.toNumber(), clockTime.hour, clockTime.min)) {
            sunText = sunsetText;
            isDayTime = true;
         }
