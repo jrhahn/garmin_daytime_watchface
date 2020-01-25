@@ -35,10 +35,6 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     const maxHeartRate = 185;
 	const minHeartRate = 40;
     
-//    var heartRateMeasurementsValues = new [sizeXAxis];
-//    var heartRateMeasurementsTimestamps = new [sizeXAxis];
-//    var heartRateMeasurementsIndex = 0;
-    
     var weatherMap = {
     	0 => imageLibClear,  // clear
     	1 => imageLibRainy, // rain
@@ -155,30 +151,16 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
 	
 		if(currentHeartrate != Mon.INVALID_HR_SAMPLE) {
 			heartrateText =  currentHeartrate.format("%d");
-		}
-		
-//		heartrateIterator = ActivityMonitor.getHeartRateHistory(sizeXAxis, false);	
-//
-//		for(var i = 0; i < sizeXAxis; i++) {
-//			heartRateMeasurementsValues[i] = heartrateIterator.next().heartRate;
-//		}			
-//						
-//	    heartRateMeasurementsValues[sizeXAxis-1] = currentHeartrate;	
-		
-//		// shift
-//		for(var i = 0; i < sizeXAxis-1; i++) {
-//			heartRateMeasurementsValues[i] = heartRateMeasurementsValues[i+1];
-//		}			
-//						
-//	    heartRateMeasurementsValues[sizeXAxis-1] = currentHeartrate;
+		}		
     } 
     
-    private function plotHeartrateGraph(dc, originX, originY, sizeX, sizeY, isDayTime) { 
-    	// todo make color time dependent     		
+    private function plotHeartrateGraph(dc, originX, originY, sizeX, sizeY, isDayTime) {     	  	
 		var heartrateIterator = ActivityMonitor.getHeartRateHistory(null, true);
 		var lastHRSample = heartrateIterator.next();
 		
-		var timeHorizon = new Time.Duration(4*3600); // last 4 hours
+		var duration = 4*3600; // last 4 hours
+		var hrSampleRate = 1; // 1 per second
+		var timeHorizon = new Time.Duration(duration); 
 		heartrateIterator = ActivityMonitor.getHeartRateHistory(timeHorizon, false);	
     	
     	if(isDayTime) {
@@ -211,39 +193,27 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     	// --> n = originX + sizeXAxis - last * sizeXAxis / timeHorizon
     	// --> n = originX + sizeXAxis - first * sizeXAxis / timeHorizon
     	// --> n = originX + sizeXAxis - (last-timeHz) * sizeXAxis / timeHorizon
-    	var m_x = 4.0 * sizeX / timeHorizon.value().toFloat();    	
+    	var m_x = 1.0 * sizeX / timeHorizon.value().toFloat();    	
     	var n_x = originX - (lastHRSample.when.value()-timeHorizon.value()) * m_x;
-    	//var n_x = originX + sizeX *( 1 - lastHRSample.when.value() / timeHorizon.value().toFloat());
-//    	var n_x = originX + sizeX - (lastHRSample.when.value();
-    	    	
-    	for(var i=0; i < sizeX; i++) {  
-    		var sample_ = heartrateIterator.next();
+
+		for(var ii = 0; ii < (hrSampleRate * duration / 3600 * sizeX).toNumber(); ii++) {
+			var sample_ = heartrateIterator.next();
     		
     		if(null == sample_) {
     			continue;
     		}
     		
-    		var hr_ = sample_.heartRate;
+    		var hr_ = sample_.heartRate;    		
     		var time_ = sample_.when.value();
-    		
-    		var posX_ = m_x * time_ + n_x;
-    		
-    		System.println("ii: " + i);
-    		System.println("n_x: " + n_x);
-    		System.println("time_: " + time_);
-    		System.println("m_x: " + m_x);
-    		System.println("pos_x: " + posX_);
-    		System.println("time horizon: " + timeHorizon.value());
-			System.println("last: " + lastHRSample.when.value());
-			
     		
     		if(Mon.INVALID_HR_SAMPLE == hr_) {
     			continue;
-    		}
+    		}    		
     		
-    		var posY_ = m_y * hr_ + n_y;
-//            dc.setColor(0x3F888F-sizeXAxis+i, Gfx.COLOR_TRANSPARENT);
-    		dc.drawCircle(posX_.toNumber(), posY_.toNumber(), 1);
+    		var posX_ = (m_x * time_ + n_x).toNumber(); 	    		    		
+    		var posY_ = (m_y * hr_ + n_y).toNumber();
+    		
+    		dc.drawCircle(posX_, posY_, 1);
     	}
     }
 
@@ -279,8 +249,8 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
          
         var isDayTime = false;
         var sunText = sunriseText;      
-        if(isBefore(clockTime.hour, clockTime.min, sunsetHH.toNumber(), sunsetMM.toNumber()) &&
-           isBefore(sunriseHH.toNumber(), sunriseMM.toNumber(), clockTime.hour, clockTime.min)) {
+        if(isBefore(clockTime.hour, clockTime.min, sunsetHH, sunsetMM) &&
+           isBefore(sunriseHH, sunriseMM, clockTime.hour, clockTime.min)) {
            sunText = sunsetText;
            isDayTime = true;
         }
@@ -292,11 +262,15 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     }
 	
 	function isBefore(timeAHH, timeAMM, timeBHH, timeBMM) {
-    	if(timeAHH < timeBHH) {
+    	if(timeAHH.toNumber() < timeBHH.toNumber()) {
     		return true;
     	}
     	
-    	if((timeAHH == timeBHH) && (timeAMM < timeBMM)) {
+    	if(timeAHH.toNumber() > timeBHH.toNumber()) {
+    		return false;
+    	}
+    	
+    	if(timeAMM.toNumber() < timeBMM.toNumber()) {
     		return true;
     	}
     	
