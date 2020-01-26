@@ -258,12 +258,10 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
                 
         dc.drawBitmap(88, 204,  WatchUi.loadResource(Rez.Drawables.Sunrise)); 
          
-        var isDayTime = false;
         var sunText = sunriseText;      
         if(isBefore(clockTime.hour, clockTime.min, sunsetHH, sunsetMM) &&
            isBefore(sunriseHH, sunriseMM, clockTime.hour, clockTime.min)) {
            sunText = sunsetText;
-           isDayTime = true;
         }
         dc.drawText(125, 200, Gfx.FONT_SYSTEM_XTINY, sunText, Gfx.TEXT_JUSTIFY_CENTER);                
         dc.drawText(120, 170, Gfx.FONT_SYSTEM_XTINY, Lang.format("$1$°C", [temperature.format("%0.1f")]), Gfx.TEXT_JUSTIFY_CENTER); 
