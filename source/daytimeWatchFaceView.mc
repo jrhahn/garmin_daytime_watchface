@@ -154,20 +154,31 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
 		}		
     } 
     
-    private function plotHeartrateGraph(dc, originX, originY, sizeX, sizeY, isDayTime) {     	  	
+    private function plotHeartrateGraph(dc, originX, originY, sizeX, sizeY, isDayTime, duration, step) {     	  	
 		var heartrateIterator = ActivityMonitor.getHeartRateHistory(null, true);
 		var lastHRSample = heartrateIterator.next();
-		
-		var duration = 4*3600; // last 4 hours
+				
 		var hrSampleRate = 1; // 1 per second
 		var timeHorizon = new Time.Duration(duration); 
 		heartrateIterator = ActivityMonitor.getHeartRateHistory(timeHorizon, false);	
     	
     	if(isDayTime) {
-    		dc.setColor(0x112277, Gfx.COLOR_TRANSPARENT);
+    		if(0 == step) {
+    			dc.setColor(0x3F888F, Gfx.COLOR_TRANSPARENT);
+			} else if(1 == step) {
+				dc.setColor(0x8FC8CF, Gfx.COLOR_TRANSPARENT);
+			} else {
+				dc.setColor(0xFFFFFF, Gfx.COLOR_TRANSPARENT);
+			}			
 		}
 		else {
-			dc.setColor(0xFFFFFF, Gfx.COLOR_TRANSPARENT);
+			if(0 == step) {
+    			dc.setColor(0xFFFFFF, Gfx.COLOR_TRANSPARENT);
+			} else if(1 == step) {
+				dc.setColor(0xAAAAAA, Gfx.COLOR_TRANSPARENT);
+			} else {
+				dc.setColor(0x555555, Gfx.COLOR_TRANSPARENT);
+			}
 		}
 			
     	dc.drawLine(originX-1, originY, originX-1, originY-sizeY);
@@ -258,7 +269,13 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
         dc.drawText(120, 170, Gfx.FONT_SYSTEM_XTINY, Lang.format("$1$°C", [temperature.format("%0.1f")]), Gfx.TEXT_JUSTIFY_CENTER); 
         dc.drawText(120, 185, Gfx.FONT_SYSTEM_XTINY, weatherMapToText[typeWeather], Gfx.TEXT_JUSTIFY_CENTER);
         
-        plotHeartrateGraph(dc, 150, 100, 60, 50, isDayTime);
+        
+        // last 12 hours
+        plotHeartrateGraph(dc, 150, 100, 60, 50, isDayTime, 12*3600, 2);
+        // last 4 hours
+        plotHeartrateGraph(dc, 150, 100, 60, 50, isDayTime, 4*3600, 1);
+        // last 1 hours
+        plotHeartrateGraph(dc, 150, 100, 60, 50, isDayTime, 1*3600, 0);
     }
 	
 	function isBefore(timeAHH, timeAMM, timeBHH, timeBMM) {
