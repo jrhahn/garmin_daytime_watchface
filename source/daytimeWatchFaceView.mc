@@ -5,6 +5,7 @@ using Toybox.WatchUi;
 using Toybox.ActivityMonitor as Mon;
 using Toybox.Application as App;
 using Toybox.Math as Math;
+using Toybox.Time;
 
 
 class daytimeWatchFaceView extends WatchUi.WatchFace {
@@ -31,6 +32,9 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     var imageLibRainy = new ImageLibraryWeatherRainy();
     var imageLibCloudy = new ImageLibraryWeatherCloudy();
     
+    const maxHeartRate = 185;
+	const minHeartRate = 40;
+    
     var weatherMap = {
     	0 => imageLibClear,  // clear
     	1 => imageLibRainy, // rain
@@ -40,8 +44,7 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     	5 => imageLibRainy, // thunderstorm
     	6 => imageLibRainy, // sleet
     	7 => imageLibRainy,  // snow
-    	8 => imageLibClear, // default
-    	null => imageLibClear
+    	8 => imageLibClear // default
     };
     
     var weatherMapToText = {
@@ -72,7 +75,7 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     }
 
     function initialize() {
-        WatchFace.initialize();
+        WatchFace.initialize();            
     }
 
     // Load your resources here
@@ -86,8 +89,9 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     function onShow() {
     }
 	
-	function loadImage(clockTime, typeWeather) {    	
-    	var hour = clockTime.hour;  	
+	function loadImage(typeWeather) { 
+        var clockTime = Sys.getClockTime();   	
+    	var hour = clockTime.hour;	
     	var minute = clockTime.min;
     	
     	var val = (hour*60 + minute) / 5;    
@@ -149,6 +153,80 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
 			heartrateText =  currentHeartrate.format("%d");
 		}		
     } 
+    
+    private function plotHeartrateGraph(dc, originX, originY, sizeX, sizeY, isDayTime, duration, step) {     	  	
+		var heartrateIterator = ActivityMonitor.getHeartRateHistory(null, true);
+		var lastHRSample = heartrateIterator.next();
+				
+		var hrSampleRate = 1; // 1 per second
+		var timeHorizon = new Time.Duration(duration); 
+		heartrateIterator = ActivityMonitor.getHeartRateHistory(timeHorizon, false);	
+    	
+    	if(isDayTime) {
+    		if(0 == step) {
+    			dc.setColor(0x3F888F, Gfx.COLOR_TRANSPARENT);
+			} else if(1 == step) {
+				dc.setColor(0x8FC8CF, Gfx.COLOR_TRANSPARENT);
+			} else {
+				dc.setColor(0xFFFFFF, Gfx.COLOR_TRANSPARENT);
+			}			
+		}
+		else {
+			if(0 == step) {
+    			dc.setColor(0xFFFFFF, Gfx.COLOR_TRANSPARENT);
+			} else if(1 == step) {
+				dc.setColor(0xAAAAAA, Gfx.COLOR_TRANSPARENT);
+			} else {
+				dc.setColor(0x555555, Gfx.COLOR_TRANSPARENT);
+			}
+		}
+			
+    	dc.drawLine(originX-1, originY, originX-1, originY-sizeY);
+    	dc.drawLine(originX-1, originY, originX+sizeX+1, originY);
+    	    	
+//		y-axis
+//    	y = mx + n//    	
+//    	originY-sizeY = m * maxHeartRate + n
+//    	originY = m * minHeartRate + n
+//    	sizeY = m * (minHeartRate-maxHeartRate)
+//      n = originY - m * minHeartRate 
+
+    	var m_y = sizeY / (minHeartRate - maxHeartRate).toFloat();
+    	var n_y = originY - m_y * minHeartRate;
+    	
+    	// x-axis
+    	// y = mx+n
+    	// I. originX = (last-timeHorizon)*m + n
+    	// II originX+sizeXAxis = last*m + n
+    	// --> sizeXAxis = timeHorizon * m
+    	// --> m = sizeXAxis / timeHorizon
+    	// --> n = originX + (timeHorizon-last)*m 
+    	// --> n = originX + sizeXAxis - last * sizeXAxis / timeHorizon
+    	// --> n = originX + sizeXAxis - first * sizeXAxis / timeHorizon
+    	// --> n = originX + sizeXAxis - (last-timeHz) * sizeXAxis / timeHorizon
+    	var m_x = 1.0 * sizeX / timeHorizon.value().toFloat();    	
+    	var n_x = originX - (lastHRSample.when.value()-timeHorizon.value()) * m_x;
+
+		for(var ii = 0; ii < (hrSampleRate * duration / 3600 * sizeX).toNumber(); ii++) {
+			var sample_ = heartrateIterator.next();
+    		
+    		if(null == sample_) {
+    			continue;
+    		}
+    		
+    		var hr_ = sample_.heartRate;    		
+    		var time_ = sample_.when.value();
+    		
+    		if(Mon.INVALID_HR_SAMPLE == hr_) {
+    			continue;
+    		}    		
+    		
+    		var posX_ = (m_x * time_ + n_x).toNumber(); 	    		    		
+    		var posY_ = (m_y * hr_ + n_y).toNumber();
+    		
+    		dc.drawCircle(posX_, posY_, 1);
+    	}
+    }
 
     // Update the view
     function onUpdate(dc) {
@@ -164,7 +242,7 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
         var typeWeather = App.getApp().getProperty("type_weather").toNumber();
         var clockTime = System.getClockTime();
   
-        dc.drawBitmap(0, 0, loadImage(clockTime, typeWeather));
+        dc.drawBitmap(0, 0, loadImage(typeWeather));
         
         dc.setColor(0x3F888F, Gfx.COLOR_TRANSPARENT);
         dc.drawText(45, 20, Gfx.FONT_NUMBER_HOT, clockTime.hour.format("%02d"), Gfx.TEXT_JUSTIFY_LEFT); 
@@ -188,14 +266,26 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
         dc.drawText(125, 200, Gfx.FONT_SYSTEM_XTINY, sunText, Gfx.TEXT_JUSTIFY_CENTER);                
         dc.drawText(120, 170, Gfx.FONT_SYSTEM_XTINY, Lang.format("$1$°C", [temperature.format("%0.1f")]), Gfx.TEXT_JUSTIFY_CENTER); 
         dc.drawText(120, 185, Gfx.FONT_SYSTEM_XTINY, weatherMapToText[typeWeather], Gfx.TEXT_JUSTIFY_CENTER);
+        
+        
+        // last 12 hours
+        plotHeartrateGraph(dc, 150, 100, 60, 50, isDayTime, 12*3600, 2);
+        // last 4 hours
+        plotHeartrateGraph(dc, 150, 100, 60, 50, isDayTime, 4*3600, 1);
+        // last 1 hours
+        plotHeartrateGraph(dc, 150, 100, 60, 50, isDayTime, 1*3600, 0);
     }
 	
 	function isBefore(timeAHH, timeAMM, timeBHH, timeBMM) {
-    	if(timeAHH < timeBHH) {
+    	if(timeAHH.toNumber() < timeBHH.toNumber()) {
     		return true;
     	}
     	
-    	if((timeAHH == timeBHH) && (timeAMM < timeBMM)) {
+    	if(timeAHH.toNumber() > timeBHH.toNumber()) {
+    		return false;
+    	}
+    	
+    	if(timeAMM.toNumber() < timeBMM.toNumber()) {
     		return true;
     	}
     	
