@@ -209,7 +209,13 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
 //    	originY = m * minHeartRate + n
 //    	sizeY = m * (minHeartRate-maxHeartRate)
 //      n = originY - m * minHeartRate 
-    	var m_y = sizeY / (minHeartRate - maxHeartRate).toFloat();
+
+		var m_y = 0;
+		
+		if(0 != minHeartRate - maxHeartRate) {
+			m_y = sizeY / (minHeartRate - maxHeartRate).toFloat();
+		}
+		
     	var n_y = originY - m_y * minHeartRate;
     	
     	// x-axis
