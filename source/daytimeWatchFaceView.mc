@@ -17,6 +17,9 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     var showLeadingZero  = true;
     var heartrateText    = "";
     
+    var colorMain = 0x3F888F;
+    var colorHighlight = 0xFF0000;
+    
     var sunriseHH   = 7;
     var sunriseMM   = 0;
     var sunriseAmPm = "";
@@ -31,6 +34,10 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     var imageLibClear = new ImageLibraryWeatherClear();
     var imageLibRainy = new ImageLibraryWeatherRainy();
     var imageLibCloudy = new ImageLibraryWeatherCloudy();
+    
+    var maxHeartRate = 185;
+    var minHeartRate = 40;
+    var doDrawAxes = false;
       
     var weatherMap = {
     	0 => imageLibClear,  // clear
@@ -72,7 +79,10 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     }
 
     function initialize() {
-        WatchFace.initialize();            
+        WatchFace.initialize();   
+        
+    	maxHeartRate = App.getApp().getProperty("maxHeartRate");
+    	minHeartRate = App.getApp().getProperty("minHeartRate");         
     }
 
     // Load your resources here
@@ -180,14 +190,16 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
 
 		var timeHorizon = new Time.Duration(duration); 
 		heartrateIterator = ActivityMonitor.getHeartRateHistory(timeHorizon, false);	
+		
+    	maxHeartRate = heartrateIterator.getMax();
+    	minHeartRate = heartrateIterator.getMin();
     	
 		dc.setColor(color, Gfx.COLOR_TRANSPARENT);
 			
-    	dc.drawLine(originX-1, originY, originX-1, originY-sizeY);
-    	dc.drawLine(originX-1, originY, originX+sizeX+1, originY);
-    	
-    	var maxHeartRate = App.getApp().getProperty("maxHeartRate");
-    	var minHeartRate = App.getApp().getProperty("minHeartRate");
+		if(doDrawAxes) {
+	    	dc.drawLine(originX-1, originY, originX-1, originY-sizeY);
+	    	dc.drawLine(originX-1, originY, originX+sizeX+1, originY);
+	    }   
     	
     	var heartRateSamplesPerSecond = App.getApp().getProperty("heartRateSamplesPerSecond");
     	    	
@@ -214,6 +226,9 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     	var n_x = originX - (lastHRSample.when.value()-timeHorizon.value()) * m_x;  
     	 
     	var numSamples = (heartRateSamplesPerSecond * duration / 3600 * sizeX).toNumber();
+    	
+    	var hrSampleMax = lastHRSample;
+    	var hrSampleMin = lastHRSample;
 
 		for(var ii = 0; ii < numSamples ; ii++) {
 			var sample_ = heartrateIterator.next();
@@ -229,11 +244,39 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     			continue;
     		}    		
     		
+    		if(null == hrSampleMax || hrSampleMax.heartRate < hr_) {
+    			hrSampleMax = sample_;
+			}
+			
+			if(null == hrSampleMin || hrSampleMin.heartRate > hr_) {
+    			hrSampleMin = sample_;
+			}
+    		
     		var posX_ = (m_x * time_ + n_x).toNumber(); 	    		    		
     		var posY_ = (m_y * hr_ + n_y).toNumber();
     		
     		dc.drawCircle(posX_, posY_, 1);
     	}
+    	    	
+    	printHearRateInPlot(dc, hrSampleMax, m_x, m_y, n_x, n_y, originX, originY);
+    	printHearRateInPlot(dc, hrSampleMin, m_x, m_y, n_x, n_y, originX, originY);
+    }
+    
+    private function printHearRateInPlot(dc, heartRateSample, m_x, m_y, n_x, n_y, originX, originY) {
+    
+    	if(null != heartRateSample) {
+    		var posX_ = (m_x * heartRateSample.when.value() + n_x).toNumber(); 
+    		var posY_ = (m_y * heartRateSample.heartRate + n_y).toNumber();
+
+			dc.setColor(colorMain, Gfx.COLOR_TRANSPARENT);
+			dc.drawLine(posX_, posY_, posX_, originY);
+			dc.drawLine(originX, posY_, posX_, posY_);
+    		
+    		var heartrateText_ = heartRateSample.heartRate.format("%d"); 
+    		dc.setPenWidth(2);   	
+	        dc.setColor(colorHighlight, Gfx.COLOR_TRANSPARENT);	
+			dc.drawText(originX, posY_ - 10, Gfx.FONT_SYSTEM_XTINY, heartrateText_, Gfx.TEXT_JUSTIFY_RIGHT);
+		}
     }
 
     // Update the view
@@ -252,9 +295,9 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
   
         dc.drawBitmap(0, 0, loadImage(typeWeather));
         
-        dc.setColor(0x3F888F, Gfx.COLOR_TRANSPARENT);
+        dc.setColor(colorMain, Gfx.COLOR_TRANSPARENT);
         dc.drawText(45, 20, Gfx.FONT_NUMBER_HOT, clockTime.hour.format("%02d"), Gfx.TEXT_JUSTIFY_LEFT); 
-        dc.setColor(0xff0000, Gfx.COLOR_TRANSPARENT);
+        dc.setColor(colorHighlight, Gfx.COLOR_TRANSPARENT);
         dc.drawText(45, 80, Gfx.FONT_NUMBER_HOT, clockTime.min.format("%02d"), Gfx.TEXT_JUSTIFY_LEFT); 
         
         dc.setColor(0xffffff, Gfx.COLOR_TRANSPARENT);              
