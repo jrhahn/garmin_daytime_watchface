@@ -269,7 +269,6 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     		var posY_ = (m_y * heartRateSample.heartRate + n_y).toNumber();
 
 			dc.setColor(colorMain, Gfx.COLOR_TRANSPARENT);
-			dc.drawLine(posX_, posY_, posX_, originY);
 			dc.drawLine(originX, posY_, posX_, posY_);
     		
     		var heartrateText_ = heartRateSample.heartRate.format("%d"); 
