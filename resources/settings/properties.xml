@@ -20,5 +20,10 @@
     
     <property id="type_weather" type="string">8</property>   
     
-    <property id="weather_temp" type="float">21.0</property>     
+    <property id="weather_temp" type="float">21.0</property>
+    
+    <property id="heartRateSamplesPerSecond" type="float">1.0</property>
+    
+    <property id="maxHeartRate" type="float">185</property>              
+    <property id="minHeartRate" type="float">40</property>
 </properties>
