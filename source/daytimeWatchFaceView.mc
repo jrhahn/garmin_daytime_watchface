@@ -268,11 +268,11 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     		
     		if(prevX_ >= 0 && prevY_ >= 0) {
     			dc.setPenWidth(1);   
-    			dc.drawLine(prevX_, prevY_, posX_, posY_);
-    			
-    			prevX_ = posX_;
-    			prevY_ = posY_;
+    			dc.drawLine(prevX_, prevY_, posX_, posY_);  
     		}
+    		
+    		prevX_ = posX_;
+			prevY_ = posY_;
     		
     		dc.setPenWidth(2);   
     		dc.drawPoint(posX_, posY_);
