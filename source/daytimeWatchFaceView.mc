@@ -38,6 +38,8 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     var maxHeartRate = 185;
     var minHeartRate = 40;
     var doDrawAxes = false;
+    
+    var lastMinute = -1;
       
     var weatherMap = {
     	0 => imageLibClear,  // clear
@@ -235,6 +237,9 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     	
     	var hrSampleMax = lastHRSample;
     	var hrSampleMin = lastHRSample;
+    	
+    	var prevX_ = -1;
+    	var prevY_ = -1;
 
 		for(var ii = 0; ii < numSamples ; ii++) {
 			var sample_ = heartrateIterator.next();
@@ -261,7 +266,16 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     		var posX_ = (m_x * time_ + n_x).toNumber(); 	    		    		
     		var posY_ = (m_y * hr_ + n_y).toNumber();
     		
-    		dc.drawCircle(posX_, posY_, 1);
+    		if(prevX_ >= 0 && prevY_ >= 0) {
+    			dc.setPenWidth(1);   
+    			dc.drawLine(prevX_, prevY_, posX_, posY_);  
+    		}
+    		
+    		prevX_ = posX_;
+			prevY_ = posY_;
+    		
+    		dc.setPenWidth(2);   
+    		dc.drawPoint(posX_, posY_);
     	}
     	    	
     	printHearRateInPlot(dc, hrSampleMax, m_x, m_y, n_x, n_y, originX, originY);
@@ -286,6 +300,14 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
 
     // Update the view
     function onUpdate(dc) {
+    	var clockTime = System.getClockTime();
+    	
+    	if(lastMinute == clockTime.min) {
+    		return;
+    	}
+    	
+    	lastMinute = clockTime.min;
+    
         var temperature = App.getApp().getProperty("weather_temp");
         showLeadingZero = App.getApp().getProperty("ShowLeadingZero");
         sunRiseSet = new SunriseSunsetCalculator();
@@ -296,7 +318,7 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
         updateHeartrateText();           	
         	
         var typeWeather = App.getApp().getProperty("type_weather").toNumber();
-        var clockTime = System.getClockTime();
+        
   
         dc.drawBitmap(0, 0, loadImage(typeWeather));
         
