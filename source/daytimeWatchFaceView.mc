@@ -238,7 +238,8 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     	var hrSampleMax = lastHRSample;
     	var hrSampleMin = lastHRSample;
     	
-    	dc.setPenWidth(2);   
+    	var prevX_ = -1;
+    	var prevY_ = -1;
 
 		for(var ii = 0; ii < numSamples ; ii++) {
 			var sample_ = heartrateIterator.next();
@@ -265,6 +266,15 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     		var posX_ = (m_x * time_ + n_x).toNumber(); 	    		    		
     		var posY_ = (m_y * hr_ + n_y).toNumber();
     		
+    		if(prevX_ >= 0 && prevY_ >= 0) {
+    			dc.setPenWidth(1);   
+    			dc.drawLine(prevX_, prevY_, posX_, posY_);
+    			
+    			prevX_ = posX_;
+    			prevY_ = posY_;
+    		}
+    		
+    		dc.setPenWidth(2);   
     		dc.drawPoint(posX_, posY_);
     	}
     	    	
