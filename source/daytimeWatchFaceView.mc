@@ -136,6 +136,8 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
         sunsetHH    = Math.floor(sunset).toNumber();
         sunsetMM    = Math.floor((sunset-Math.floor(sunset))*60).toNumber();
         var sunsetAmPm  = "";
+        
+        if(App.getApp().getProperty("IsSummerTime")) { sunsetHH += 1; }        	
 
         if (sunriseMM < 10) { sunriseMM = "0" + sunriseMM; }
         if (sunsetMM < 10) { sunsetMM = "0" + sunsetMM; }
