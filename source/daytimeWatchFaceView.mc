@@ -69,10 +69,12 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     function onPartialUpdate(dc) {
         var clockTime = Sys.getClockTime();
 
-        if ((clockTime.hour == 0 && clockTime.min == 0 && clockTime.sec == 59)
-                || !sunriseIsInit) {
-            sunrise = sunRiseSet.computeSunrise(true) / 3600000;
-            sunset = sunRiseSet.computeSunrise(false) / 3600000;
+        if (
+			(clockTime.hour == 0 && clockTime.min == 0 && clockTime.sec == 59) ||
+			!sunriseIsInit
+		) {
+            sunrise = sunRiseSet.computeSunrise(true);
+            sunset = sunRiseSet.computeSunrise(false);
             
             calcSunriseSunset();
             
@@ -99,7 +101,7 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     }
 	
 	function loadImage(typeWeather) { 
-        var clockTime = Sys.getClockTime();   	
+        var clockTime = Sys.getClockTime();   		
     	var hour = clockTime.hour;	
     	var minute = clockTime.min;
     	
@@ -137,16 +139,16 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
         sunsetMM    = Math.floor((sunset-Math.floor(sunset))*60).toNumber();
         var sunsetAmPm  = "";
         
-        if(App.getApp().getProperty("IsSummerTime")) { sunsetHH += 1; }        	
-
         if (sunriseMM < 10) { sunriseMM = "0" + sunriseMM; }
         if (sunsetMM < 10) { sunsetMM = "0" + sunsetMM; }
+
         if (!is24Hour) {
             sunriseAmPm = sunriseHH < 12 ? "A" : "P";
             sunsetAmPm  = sunsetHH < 12 ? "A" : "P";
             sunriseHH   = sunriseHH == 0 ? sunriseHH : sunriseHH % 12;
             sunsetHH    = sunsetHH == 0 ? sunsetHH : sunsetHH % 12;
         }
+		
         if (showLeadingZero) {
             sunriseText = Lang.format("$1$:$2$$3$", [sunriseHH.format("%02d"), sunriseMM, sunriseAmPm]);
             sunsetText  = Lang.format("$1$:$2$$3$", [sunsetHH.format("%02d"), sunsetMM, sunsetAmPm]);
@@ -330,8 +332,8 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
         dc.drawText(45, 80, Gfx.FONT_NUMBER_HOT, clockTime.min.format("%02d"), Gfx.TEXT_JUSTIFY_LEFT); 
         
         dc.setColor(0xffffff, Gfx.COLOR_TRANSPARENT);              
-        dc.drawBitmap(40, 170,  WatchUi.loadResource(Rez.Drawables.Footprints));
-        dc.drawText(60, 170, Gfx.FONT_SYSTEM_XTINY, stepCount, Gfx.TEXT_JUSTIFY_LEFT);
+        dc.drawBitmap(30, 170,  WatchUi.loadResource(Rez.Drawables.Footprints));
+        dc.drawText(50, 170, Gfx.FONT_SYSTEM_XTINY, stepCount, Gfx.TEXT_JUSTIFY_LEFT);
         
         dc.drawBitmap(160, 175,  WatchUi.loadResource(Rez.Drawables.Heart));
         dc.drawText(180, 170, Gfx.FONT_SYSTEM_XTINY, heartrateText, Gfx.TEXT_JUSTIFY_LEFT);

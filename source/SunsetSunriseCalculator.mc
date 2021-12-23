@@ -12,10 +12,14 @@ using Toybox.Activity as Activity;
 
 
 class SunriseSunsetCalculator {
+    // todo: change this for summer time!
+    var dst = false; // App.getApp().getProperty("IsSummerTime");
+    var lat = 49.878708; //App.getApp().getProperty("UserLat").toFloat();
+    var lng = 8.6; //App.getApp().getProperty("UserLng").toFloat();    
     
     function initialize() {
-        App.getApp().setProperty("sunrise", (computeSunrise(true) / 3600000));
-        App.getApp().setProperty("sunset", (computeSunrise(false) / 3600000));
+        App.getApp().setProperty("sunrise", (computeSunrise(true)));
+        App.getApp().setProperty("sunset", (computeSunrise(false)));
     }
     
     function dayOfTheYear() {
@@ -29,7 +33,7 @@ class SunriseSunsetCalculator {
         return N1 - (N2 * N3) + day - 30;
     }
 
-    function computeSunrise(sunrise) {
+    function computeSunrise(sunrise) {        
         /* Sunrise/Sunset Algorithm taken from
             http://williams.best.vwh.net/sunrise_sunset_algorithm.htm
             inputs:
@@ -39,8 +43,6 @@ class SunriseSunsetCalculator {
                 time of sunrise/sunset in hours
         */
         var day    = dayOfTheYear();
-        var lat    = App.getApp().getProperty("UserLat").toFloat();
-        var lng    = App.getApp().getProperty("UserLng").toFloat();
         var zenith = 90.83333333333333;
         var D2R    = Math.PI / 180;
         var R2D    = 180.0 / Math.PI;
@@ -88,8 +90,8 @@ class SunriseSunsetCalculator {
         var UT = clampTo24((T - lnHour));
 
         // Current timezone offset from settings
-        var currentTimezoneOffset = 1; // App.getApp().getProperty("CurrentTimezoneOffset").toFloat() / 3600.0;
-		var dst = false; //App.getApp().getProperty("CurrentDST");
+        var currentTimezoneOffset = App.getApp().getProperty("CurrentTimezoneOffset").toFloat() / 3600.0;
+		
         // Take current timezone daylight saving time into account from settings
         if (dst == true) {
             currentTimezoneOffset++;
@@ -99,7 +101,7 @@ class SunriseSunsetCalculator {
         var localT = clampTo24((UT + currentTimezoneOffset));
 
         // Convert to Milliseconds
-        return localT * 3600 * 1000;
+        return localT;
     }
     
     function clampTo24(value) {

@@ -6,7 +6,6 @@ class daytimeDelegate extends Ui.WatchFaceDelegate {
         Ui.WatchFaceDelegate.initialize();
     }
     
-    function onPowerBudgetExceeded(powerInfo) {
-                 
+    function onPowerBudgetExceeded(powerInfo) {                 
     }
 }
