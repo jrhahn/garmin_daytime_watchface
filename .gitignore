@@ -1,7 +1,11 @@
 *.prg
 *.debug.xml
 **/*.zip
-**/*.bmp
+resources/drawables/*.bmp
+resources/drawables/images/*.bmp
+
+*.pem
+*.der
 
 **/build/
-**/resources/drawables
+**/cache/

@@ -1,11 +1,12 @@
 using Toybox.Graphics as Gfx;
 using Toybox.System as Sys;
-using Toybox.Lang;
 using Toybox.WatchUi;
 using Toybox.ActivityMonitor as Mon;
 using Toybox.Application as App;
 using Toybox.Math as Math;
 using Toybox.Time;
+import Toybox.Lang;
+
 
 
 class daytimeWatchFaceView extends WatchUi.WatchFace {
@@ -14,7 +15,6 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     var sunrise = 0;
     var sunset = 0;
     var is24Hour = true;
-    var showLeadingZero  = true;
     var heartrateText    = "";
     
     var colorMain = 0x3F888F;
@@ -50,21 +50,10 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     	5 => imageLibRainy, // thunderstorm
     	6 => imageLibRainy, // sleet
     	7 => imageLibRainy,  // snow
-    	8 => imageLibClear // default
+    	8 => imageLibRainy, // mist
+		9 => imageLibClear // default
     };
     
-    var weatherMapToText = {
-    	0 => "clear",  // clear
-    	1 => "rain", // rain
-    	2 => "hail", // hail
-    	3 => "cloudy", // cloudy
-    	4 => "partly-cloudy", // partly-cloudy
-    	5 => "thunderstorm", // thunderstorm
-    	6 => "sleet", // sleet
-    	7 => "snow",  // snow
-    	8 => "" // default
-    };
-	
 	// Called every second
     function onPartialUpdate(dc) {
         var clockTime = Sys.getClockTime();
@@ -90,7 +79,7 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     }
 
     // Load your resources here
-    function onLayout(dc) {
+    function onLayout(dc) as Void {
         setLayout(Rez.Layouts.WatchFace(dc));
     }
 
@@ -148,14 +137,9 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
             sunriseHH   = sunriseHH == 0 ? sunriseHH : sunriseHH % 12;
             sunsetHH    = sunsetHH == 0 ? sunsetHH : sunsetHH % 12;
         }
-		
-        if (showLeadingZero) {
-            sunriseText = Lang.format("$1$:$2$$3$", [sunriseHH.format("%02d"), sunriseMM, sunriseAmPm]);
-            sunsetText  = Lang.format("$1$:$2$$3$", [sunsetHH.format("%02d"), sunsetMM, sunsetAmPm]);
-        } else {
-            sunriseText = Lang.format("$1$:$2$$3$", [sunriseHH, sunriseMM, sunriseAmPm]);
-            sunsetText  = Lang.format("$1$:$2$$3$", [sunsetHH, sunsetMM, sunsetAmPm]);
-        }
+		        
+		sunriseText = format("$1$:$2$$3$", [sunriseHH.format("%02d"), sunriseMM, sunriseAmPm]);
+		sunsetText  = format("$1$:$2$$3$", [sunsetHH.format("%02d"), sunsetMM, sunsetAmPm]);        
     }
 	
 	private function updateHeartrateText() {   
@@ -167,7 +151,10 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
 		}		
     } 
     
-    private function getColor(isDayTime, step) {
+    private function getColor(
+		isDayTime as Boolean,
+		step as Number
+	) as Number {
     	if(isDayTime) {
     		if(0 == step) {
     			return 0x3F888F;
@@ -186,11 +173,17 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
 				return 0x555555;
 			}
 		}
-		
-		return 0x555555;
     }
     
-    private function plotHeartrateGraph(dc, originX, originY, sizeX, sizeY, duration, color) {     	  	
+    private function plotHeartrateGraph(
+		dc, 
+		originX as Number, 
+		originY as Number, 
+		sizeX as Number, 
+		sizeY as Number, 
+		duration as Number, 
+		color as Number
+	) {     	
 		var heartrateIterator = ActivityMonitor.getHeartRateHistory(null, true);
 		var lastHRSample = heartrateIterator.next();			    	 			
 
@@ -282,11 +275,19 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     		dc.drawPoint(posX_, posY_);
     	}
     	    	
-    	printHearRateInPlot(dc, hrSampleMax, m_x, m_y, n_x, n_y, originX, originY);
-    	printHearRateInPlot(dc, hrSampleMin, m_x, m_y, n_x, n_y, originX, originY);
+    	printHeartrateInPlot(dc, hrSampleMax, m_x, m_y, n_x, n_y, originX, originY);
+    	printHeartrateInPlot(dc, hrSampleMin, m_x, m_y, n_x, n_y, originX, originY);
     }
     
-    private function printHearRateInPlot(dc, heartRateSample, m_x, m_y, n_x, n_y, originX, originY) {
+    private function printHeartrateInPlot(
+		dc,
+		heartRateSample as Null or Toybox.ActivityMonitor.HeartRateSample,
+		m_x as Float, 
+		m_y as Number, 
+		n_x as Float, 
+		n_y as Number, 
+		originX as Number, 
+		originY as Number) as Void {
     
     	if(null != heartRateSample) {
     		var posX_ = (m_x * heartRateSample.when.value() + n_x).toNumber(); 
@@ -306,14 +307,13 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
     function onUpdate(dc) {
     	var clockTime = System.getClockTime();
     	
-    	if(lastMinute == clockTime.min) {
+    	/*if(lastMinute == clockTime.min) {
     		return;
-    	}
+    	}*/
     	
     	lastMinute = clockTime.min;
     
-        var temperature = App.getApp().getProperty("weather_temp");
-        showLeadingZero = App.getApp().getProperty("ShowLeadingZero");
+        var temperature = App.getApp().getProperty("weatherTemperature");
         sunRiseSet = new SunriseSunsetCalculator();
         
         var stepCount = Mon.getInfo().steps.toString();        
@@ -321,25 +321,28 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
         
         updateHeartrateText();           	
         	
-        var typeWeather = App.getApp().getProperty("type_weather").toNumber();
-        
+        var typeWeatherCode = App.getApp().getProperty("weatherCode").toNumber();        
+		var typeWeatherText = App.getApp().getProperty("weatherText");        
   
-        dc.drawBitmap(0, 0, loadImage(typeWeather));
+        dc.drawBitmap(0, 0, loadImage(typeWeatherCode));
         
         dc.setColor(colorMain, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(45, 20, Gfx.FONT_NUMBER_HOT, clockTime.hour.format("%02d"), Gfx.TEXT_JUSTIFY_LEFT); 
+        dc.drawText(41, 27, Gfx.FONT_NUMBER_THAI_HOT, clockTime.hour.format("%02d"), Gfx.TEXT_JUSTIFY_LEFT); 
         dc.setColor(colorHighlight, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(45, 80, Gfx.FONT_NUMBER_HOT, clockTime.min.format("%02d"), Gfx.TEXT_JUSTIFY_LEFT); 
-        
+        dc.drawText(41, 92, Gfx.FONT_NUMBER_THAI_HOT, clockTime.min.format("%02d"), Gfx.TEXT_JUSTIFY_LEFT);         
+
+		// footprints
         dc.setColor(0xffffff, Gfx.COLOR_TRANSPARENT);              
-        dc.drawBitmap(30, 170,  WatchUi.loadResource(Rez.Drawables.Footprints));
-        dc.drawText(50, 170, Gfx.FONT_SYSTEM_XTINY, stepCount, Gfx.TEXT_JUSTIFY_LEFT);
+        dc.drawBitmap(33, 180,  WatchUi.loadResource(Rez.Drawables.Footprints));		
+        dc.drawText(55, 180, Gfx.FONT_SYSTEM_XTINY, stepCount, Gfx.TEXT_JUSTIFY_LEFT);
+
+		// temperature
+		dc.drawText(138, 180, Gfx.FONT_SYSTEM_XTINY, format("$1$°C", [temperature.format("%0.1f")]), Gfx.TEXT_JUSTIFY_CENTER); 
         
-        dc.drawBitmap(160, 175,  WatchUi.loadResource(Rez.Drawables.Heart));
-        dc.drawText(180, 170, Gfx.FONT_SYSTEM_XTINY, heartrateText, Gfx.TEXT_JUSTIFY_LEFT);
-                
-        dc.drawBitmap(88, 204,  WatchUi.loadResource(Rez.Drawables.Sunrise)); 
-         
+		// heartrate
+        dc.drawBitmap(173, 184,  WatchUi.loadResource(Rez.Drawables.Heart));
+        dc.drawText(190, 180, Gfx.FONT_SYSTEM_XTINY, heartrateText, Gfx.TEXT_JUSTIFY_LEFT);
+                                 
         var isDayTime = false;
         var sunText = sunriseText;      
         if(isBefore(clockTime.hour, clockTime.min, sunsetHH, sunsetMM) &&
@@ -347,13 +350,17 @@ class daytimeWatchFaceView extends WatchUi.WatchFace {
            sunText = sunsetText;
            isDayTime = true;
         }
-        dc.drawText(125, 200, Gfx.FONT_SYSTEM_XTINY, sunText, Gfx.TEXT_JUSTIFY_CENTER);                
-        dc.drawText(120, 170, Gfx.FONT_SYSTEM_XTINY, Lang.format("$1$°C", [temperature.format("%0.1f")]), Gfx.TEXT_JUSTIFY_CENTER); 
-        dc.drawText(120, 185, Gfx.FONT_SYSTEM_XTINY, weatherMapToText[typeWeather], Gfx.TEXT_JUSTIFY_CENTER);
+
+		// weather
+        dc.drawText(138, 200, Gfx.FONT_SYSTEM_XTINY, typeWeatherText, Gfx.TEXT_JUSTIFY_CENTER);
+
+		// time sunset / sunrise
+		dc.drawBitmap(95, 225,  WatchUi.loadResource(Rez.Drawables.Sunrise)); 		
+        dc.drawText(138, 220, Gfx.FONT_SYSTEM_XTINY, sunText, Gfx.TEXT_JUSTIFY_CENTER);                        		
                 
         // last 4 hours
         var colorHeartRate = getColor(isDayTime, 0);
-        plotHeartrateGraph(dc, 150, 100, 60, 50, 4*3600, colorHeartRate);        
+        plotHeartrateGraph(dc, 160, 145, 70, 80, 4*3600, colorHeartRate);        
     }
 	
 	function isBefore(timeAHH, timeAMM, timeBHH, timeBMM) {

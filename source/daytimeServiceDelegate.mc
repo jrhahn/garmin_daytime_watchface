@@ -2,76 +2,79 @@
 using Toybox.Background;
 using Toybox.System;
 using Toybox.Application as App;
-using Toybox.Communications as Comm;
+import Toybox.Communications;
+import Toybox.Lang;
+
 
 (:background)
 class daytimeServiceDelegate extends System.ServiceDelegate {
+    var apiKey = App.getApp().getProperty("WeatherAPIKey");
+    var location = App.getApp().getProperty("Location");
+
     
     function initialize() {
         ServiceDelegate.initialize();        
     }
     
-    function onTemporalEvent() {
-        var apiKey = App.getApp().getProperty("DarkSkyApiKey");
-        var lat    = App.getApp().getProperty("UserLat").toFloat();
-        var lng    = App.getApp().getProperty("UserLng").toFloat();
+    function onTemporalEvent() as Void {
+
         if (System.getDeviceSettings().phoneConnected &&
             apiKey.length() > 0 &&
-            (null != lat && null != lng)) {
-            makeRequest(lat, lng);
+            (null != location)) {
+            makeRequest(location);
         }
     }
 
-    function makeRequest(lat, lng) {
-        var apiKey         = App.getApp().getProperty("DarkSkyApiKey");
-        var currentWeather = true; //App.getApp().getProperty("CurrentWeather");
-        var url            = "https://api.darksky.net/forecast/" + apiKey + "/" + lat.toString() + "," + lng.toString();
-        var params;
-        if (currentWeather) {
-            params = { "exclude" => "daily,minutely,hourly,alerts,flags", "units" => "si" };
-        } else {
-            url    = url + "," + Time.now().value();
-            params = { "exclude" => "currently,minutely,hourly,alerts,flags", "units" => "si" };
-        }
+    function makeRequest(location as String) as Void {        
+        var url = "https://api.weatherapi.com/v1/current.json?key=" + apiKey + "&q=" + location + "&aqi=no";
+
+        var params = null;
+
         var options = {
-            :methods => Comm.HTTP_REQUEST_METHOD_GET,
-            :headers => { "Content-Type" => Comm.REQUEST_CONTENT_TYPE_JSON },
-            :responseType => Comm.HTTP_RESPONSE_CONTENT_TYPE_JSON
+            :methods => Communications.HTTP_REQUEST_METHOD_GET,
+            :headers => { "Content-Type" => Communications.REQUEST_CONTENT_TYPE_JSON },
+            :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
         };
-        Comm.makeWebRequest(url, params, options, method(:onReceive));
+
+        Communications.makeWebRequest(url, params, options, method(:onReceive));
     }
 
-    function onReceive(responseCode, data) {
+    function onReceive(responseCode as Number, data as Dictionary or String or Null) as Void {
         if (responseCode == 200) {
             if (data instanceof Lang.String && data.equals("Forbidden")) {
                 var dict = { "msg" => "WRONG KEY" };
                 Background.exit(dict);
-            } else {
-                var currentWeather = App.getApp().getProperty("CurrentWeather");
-                if (currentWeather) {
-                    var currently = data.get("currently");
-                    var dict = {
-                        "icon" => currently.get("icon"),
-                        "temp" => currently.get("temperature"),
-                        "msg"  => "CURRENTLY"
-                    };
-                    Background.exit(dict);
-                } else {
-                    var daily = data.get("daily");
-                    var days  = daily.get("data");
-                    var today = days[0];
-                    var dict = {
-                        "icon"    => today.get("icon"),
-                        "minTemp" => today.get("temperatureMin"),
-                        "maxTemp" => today.get("temperatureMax"),
-                        "msg"     => "DAILY"
-                    };
+            } else if(data instanceof Lang.Dictionary) {
+                var current = data["current"];
+
+                if(current == null) {
+                    var dict = { "msg" => "No current data found" };
                     Background.exit(dict);
                 }
+
+                var condition = current.get("condition");
+
+                if(condition == null) {
+                    var dict = { "msg" => "No condition data found" };
+                    Background.exit(dict);
+                }
+                
+                var dict = {
+                    "condition_code" => condition.get("code"),
+                    "condition_text" => condition.get("text"),
+                    "temperature" => current.get("temp_c"),
+                    "msg" => "CURRENT",
+                }; 
+
+                Background.exit(dict);          
             }
         } else {
-            var dict = { "msg" => "FAIL" };
+            var dict = { 
+                "msg" => "FAIL",
+                "error" => responseCode.toString()
+            };
+
             Background.exit(dict);
-        }
-    }
+        } 
+    } 
 }
