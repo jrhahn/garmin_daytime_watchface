@@ -1,24 +1,21 @@
 <properties>
-    <property id="HourColor" type="number">0xFFFFFF</property>
-    <property id="MinuteColor" type="number">0xFFFFFF</property>
+    <property id="HourColor" type="long">0xFFFFFF</property>
+    <property id="MinuteColor" type="long">0xFFFFFF</property>
     
-    <property id="UserLat" type="float">49.878708</property>    
-    <property id="UserLng" type="float">8.646927</property> 
+    <property id="Location" type="string">Darmstadt</property>
+    
           
-    <property id="CurrentTimezoneOffset" type="number">3600</property>
+    <property id="CurrentTimezoneOffset" type="long">3600</property>
     
-    <property id="IsSummerTime" type="boolean">false</property>
-	
-	<property id="CurrentWeather" type="boolean">true</property>
-        
-    <property id="DarkSkyApiKey" type="string"></property>    
-    
-    <property id="type_weather" type="string">8</property>   
-    
-    <property id="weather_temp" type="float">21.0</property>
+    <property id="IsSummerTime" type="boolean">true</property>
+	        
+    <property id="weatherCode" type="long">8</property>   
+    <property id="weatherText" type="string">Clear</property>       
+    <property id="weatherTemperature" type="float">21.0</property>
+    <property id="WeatherAPIKey" type="string">d022745fd84841668bc172013231712</property>
     
     <property id="heartRateSamplesPerSecond" type="float">1.0</property>
     
-    <property id="maxHeartRate" type="number">185</property>              
-    <property id="minHeartRate" type="number">40</property>
+    <property id="maxHeartRate" type="long">185</property>              
+    <property id="minHeartRate" type="long">40</property>
 </properties>
