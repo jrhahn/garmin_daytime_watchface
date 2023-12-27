@@ -1,2 +1,7 @@
 *.prg
 *.debug.xml
+**/*.zip
+**/*.bmp
+
+**/build/
+**/resources/drawables
