@@ -4,6 +4,8 @@
 resources/drawables/*.bmp
 resources/drawables/images/*.bmp
 
+properties.xml
+
 *.pem
 *.der
 
